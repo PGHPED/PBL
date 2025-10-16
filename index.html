@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proyecto: Nos Atacan Virus y Bacterias</title>
     <link rel="stylesheet" href="index.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -19,10 +19,10 @@
     <nav class="navigation">
         <div class="container">
             <ul class="nav-list">
-                <li><a href="#problema" class="nav-link">Problema Principal</a></li>
-                <li><a href="#calculos" class="nav-link">Cálculos COVID-19</a></li>
-                <li><a href="#quorum" class="nav-link">Quorum Sensing</a></li>
-                <li><a href="#simulacion" class="nav-link">Simulación</a></li>
+                <li><a href="#problema" class="nav-link">🎯 Problema Principal</a></li>
+                <li><a href="#calculos" class="nav-link">📊 Cálculos COVID-19</a></li>
+                <li><a href="#quorum" class="nav-link">🧬 Quorum Sensing</a></li>
+                <li><a href="#simulacion" class="nav-link">🎮 Simulación</a></li>
             </ul>
         </div>
     </nav>
@@ -57,50 +57,73 @@
             </div>
         </section>
 
-        <!-- Cálculos COVID-19 -->
+        <!-- Tabla de Bacteria -->
         <section id="calculos" class="section">
             <div class="container">
-                <h2 class="section-title">📊 Análisis del Crecimiento Exponencial</h2>
+                <h2 class="section-title">📊 Tabla de Bacteria</h2>
                 
-                <div class="calculations-grid">
-                    <div class="calc-card">
-                        <h3>Cálculo de Divisiones</h3>
-                        <p>En 2,880 minutos con duplicación cada 20 minutos:</p>
-                        <div class="calculation-result">
-                            <span class="formula">2,880 ÷ 20 = 144 divisiones</span>
-                        </div>
-                        <p>Esto significa que una bacteria se multiplicaría 2¹⁴⁴ veces</p>
-                    </div>
-
-                    <div class="calc-card">
-                        <h3>Masa Total Alcanzada</h3>
-                        <div class="calculation-result">
-                            <span class="formula">7×10⁻¹⁶ × 2¹⁴⁴ ≈ 6×10¹⁵ kg</span>
-                        </div>
-                        <p>¡Equivalente a la masa de la Tierra!</p>
-                    </div>
-
-                    <div class="calc-card">
-                        <h3>Simulador de Crecimiento</h3>
-                        <div class="simulator">
-                            <label for="tiempo">Tiempo (minutos):</label>
-                            <input type="range" id="tiempo" min="0" max="2880" value="1440" step="20">
-                            <span id="tiempo-valor">1440 min</span>
-                            
-                            <label for="intervalo">Intervalo de duplicación (min):</label>
-                            <input type="range" id="intervalo" min="10" max="60" value="20" step="5">
-                            <span id="intervalo-valor">20 min</span>
-                            
-                            <div class="resultado">
-                                <p>Número de bacterias: <span id="numero-bacterias">1.84×10⁴³</span></p>
-                                <p>Masa total: <span id="masa-total">1.29×10²⁸ kg</span></p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="table-container">
+                    <table id="datos-tabla" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Intervalos de 20 minutos</th>
+                                <th>Número de Bacterias</th>
+                                <th>Masa (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="chart-container">
-                    <canvas id="growthChart"></canvas>
+                
+                <div class="covid-data">
+                    <h3>🦠 Tabla de COVID-19</h3>
+                    <div class="table-container">
+                        <table id="covid-tabla" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Días</th>
+                                    <th>Número de Infectados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Lunes (0)</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td>Martes (1)</td>
+                                    <td>20</td>
+                                </tr>
+                                <tr>
+                                    <td>Miércoles (2)</td>
+                                    <td>400</td>
+                                </tr>
+                                <tr>
+                                    <td>Jueves (3)</td>
+                                    <td>8,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Viernes (4)</td>
+                                    <td>160,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Sábado (5)</td>
+                                    <td>3,200,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Domingo (6)</td>
+                                    <td>64,000,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Lunes (7)</td>
+                                    <td>1,280,000,000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>

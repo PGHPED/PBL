@@ -51,6 +51,14 @@ function inicializarSimulador() {
             
             numeroBacterias.textContent = formatScientific(resultado.poblacionFinal);
             masaTotal.textContent = `${formatScientific(resultado.masaTotal)} kg`;
+            
+            // Agregar animación suave
+            numeroBacterias.style.transform = 'scale(1.05)';
+            masaTotal.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                numeroBacterias.style.transform = 'scale(1)';
+                masaTotal.style.transform = 'scale(1)';
+            }, 200);
         }
 
         tiempoSlider.addEventListener('input', actualizarCalculos);
@@ -91,7 +99,9 @@ function crearGraficoCrecimiento() {
             borderColor: ['#3b82f6', '#10b981', '#f59e0b'][index],
             backgroundColor: ['rgba(59, 130, 246, 0.1)', 'rgba(16, 185, 129, 0.1)', 'rgba(245, 158, 11, 0.1)'][index],
             tension: 0.4,
-            fill: false
+            fill: false,
+            pointRadius: 4,
+            pointHoverRadius: 6
         });
     });
     
@@ -108,37 +118,65 @@ function crearGraficoCrecimiento() {
                     display: true,
                     text: 'Crecimiento Exponencial de Bacterias',
                     font: {
-                        size: 16,
+                        size: 18,
                         weight: 'bold'
-                    }
+                    },
+                    padding: 20
                 },
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14
+                        },
+                        padding: 20
+                    }
                 }
             },
             scales: {
                 x: {
                     title: {
                         display: true,
-                        text: 'Tiempo'
+                        text: 'Tiempo (horas)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
                     }
                 },
                 y: {
                     title: {
                         display: true,
-                        text: 'Log₁₀ (Número de Bacterias)'
+                        text: 'Log₁₀ (Número de Bacterias)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
                     },
                     ticks: {
                         callback: function(value) {
                             return `10^${value}`;
+                        },
+                        font: {
+                            size: 12
                         }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
                     }
                 }
             },
             interaction: {
                 intersect: false,
                 mode: 'index'
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
             }
         }
     });
@@ -178,27 +216,44 @@ function inicializarSimuladorInteractivo() {
 
         function ejecutarSimulacion() {
             try {
-                const tiempo = parseFloat(tiempoSlider.value) * 24 * 60; // Convertir días a minutos
-                const intervalo = parseInt(intervaloSlider.value);
-                const poblacionInicial = parseInt(poblacionInput.value) || 1;
+                // Agregar efecto visual al botón
+                simularBtn.textContent = ' simulando...';
+                simularBtn.disabled = true;
                 
-                const resultado = calcularCrecimiento(tiempo, intervalo, poblacionInicial);
-                
-                finalPoblacion.textContent = formatScientific(resultado.poblacionFinal);
-                totalDivisiones.textContent = Math.round(resultado.divisiones);
-                masaSimulada.textContent = `${formatScientific(resultado.masaTotal)} kg`;
-                
-                const ratioTierra = resultado.masaTotal / MASSA_TERRA;
-                if (ratioTierra >= 1) {
-                    comparacionTierra.textContent = `${formatScientific(ratioTierra)} veces la masa terrestre`;
-                } else {
-                    comparacionTierra.textContent = `${(ratioTierra * 100).toFixed(2)}% de la masa terrestre`;
-                }
-                
-                crearGraficoSimulacion(tiempo, intervalo, poblacionInicial);
+                // Simular carga
+                setTimeout(() => {
+                    const tiempo = parseFloat(tiempoSlider.value) * 24 * 60; // Convertir días a minutos
+                    const intervalo = parseInt(intervaloSlider.value);
+                    const poblacionInicial = parseInt(poblacionInput.value) || 1;
+                    
+                    const resultado = calcularCrecimiento(tiempo, intervalo, poblacionInicial);
+                    
+                    finalPoblacion.textContent = formatScientific(resultado.poblacionFinal);
+                    totalDivisiones.textContent = Math.round(resultado.divisiones);
+                    masaSimulada.textContent = `${formatScientific(resultado.masaTotal)} kg`;
+                    
+                    const ratioTierra = resultado.masaTotal / MASSA_TERRA;
+                    if (ratioTierra >= 1) {
+                        comparacionTierra.textContent = `${formatScientific(ratioTierra)} veces la masa terrestre`;
+                    } else {
+                        comparacionTierra.textContent = `${(ratioTierra * 100).toFixed(2)}% de la masa terrestre`;
+                    }
+                    
+                    // Restaurar botón
+                    simularBtn.textContent = 'Simular Crecimiento';
+                    simularBtn.disabled = false;
+                    
+                    // Crear gráfico
+                    crearGraficoSimulacion(tiempo, intervalo, poblacionInicial);
+                    
+                    // Mostrar notificación de éxito
+                    mostrarNotificacion('Simulación completada exitosamente', 'success');
+                }, 500);
             } catch (error) {
                 console.error('Error al ejecutar la simulación:', error);
                 mostrarNotificacion('Error al ejecutar la simulación', 'error');
+                simularBtn.textContent = 'Simular Crecimiento';
+                simularBtn.disabled = false;
             }
         }
 
@@ -257,7 +312,9 @@ function crearGraficoSimulacion(tiempoMax, intervalo, poblacionInicial) {
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,
-                        yAxisID: 'y'
+                        yAxisID: 'y',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
                     },
                     {
                         label: 'Masa Total (log₁₀ kg)',
@@ -265,7 +322,9 @@ function crearGraficoSimulacion(tiempoMax, intervalo, poblacionInicial) {
                         borderColor: '#ef4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
                         tension: 0.4,
-                        yAxisID: 'y1'
+                        yAxisID: 'y1',
+                        pointRadius: 5,
+                        pointHoverRadius: 7
                     }
                 ]
             },
@@ -276,20 +335,34 @@ function crearGraficoSimulacion(tiempoMax, intervalo, poblacionInicial) {
                         display: true,
                         text: 'Simulación de Crecimiento Bacteriano',
                         font: {
-                            size: 16,
+                            size: 18,
                             weight: 'bold'
-                        }
+                        },
+                        padding: 20
                     },
                     legend: {
                         display: true,
-                        position: 'top'
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14
+                            },
+                            padding: 20
+                        }
                     }
                 },
                 scales: {
                     x: {
                         title: {
                             display: true,
-                            text: 'Tiempo (días)'
+                            text: 'Tiempo (días)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
                         }
                     },
                     y: {
@@ -298,12 +371,22 @@ function crearGraficoSimulacion(tiempoMax, intervalo, poblacionInicial) {
                         position: 'left',
                         title: {
                             display: true,
-                            text: 'Log₁₀ (Población)'
+                            text: 'Log₁₀ (Población)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
                         },
                         ticks: {
                             callback: function(value) {
                                 return `10^${value}`;
+                            },
+                            font: {
+                                size: 12
                             }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
                         }
                     },
                     y1: {
@@ -312,11 +395,18 @@ function crearGraficoSimulacion(tiempoMax, intervalo, poblacionInicial) {
                         position: 'right',
                         title: {
                             display: true,
-                            text: 'Log₁₀ (Masa en kg)'
+                            text: 'Log₁₀ (Masa en kg)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
                         },
                         ticks: {
                             callback: function(value) {
                                 return `10^${value}`;
+                            },
+                            font: {
+                                size: 12
                             }
                         },
                         grid: {
@@ -327,6 +417,10 @@ function crearGraficoSimulacion(tiempoMax, intervalo, poblacionInicial) {
                 interaction: {
                     intersect: false,
                     mode: 'index'
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
                 }
             }
         });
@@ -334,6 +428,104 @@ function crearGraficoSimulacion(tiempoMax, intervalo, poblacionInicial) {
         console.error('Error al crear el gráfico de simulación:', error);
         mostrarNotificacion('Error al crear el gráfico de simulación', 'error');
     }
+}
+
+// Función para poblar la tabla con datos del Google Spreadsheet
+function poblarTablaDatos() {
+    // Datos del Google Spreadsheet
+    const datos = [
+        { hora: "8:00", intervalo: 0, bacterias: 7, masa: "0.0000000000000049" },
+        { hora: "8:20", intervalo: 1, bacterias: 14, masa: "0.0000000000000098" },
+        { hora: "8:40", intervalo: 2, bacterias: 28, masa: "0.0000000000000196" },
+        { hora: "9:00", intervalo: 3, bacterias: 56, masa: "0.0000000000000392" },
+        { hora: "9:20", intervalo: 4, bacterias: 112, masa: "0.0000000000000784" },
+        { hora: "9:40", intervalo: 5, bacterias: 224, masa: "0.0000000000001568" },
+        { hora: "10:00", intervalo: 6, bacterias: 448, masa: "0.0000000000003136" },
+        { hora: "10:20", intervalo: 7, bacterias: 896, masa: "0.0000000000006272" },
+        { hora: "10:40", intervalo: 8, bacterias: 1792, masa: "0.0000000000012544" },
+        { hora: "11:00", intervalo: 9, bacterias: 3584, masa: "0.0000000000025088" },
+        { hora: "11:20", intervalo: 10, bacterias: 7168, masa: "0.0000000000050176" },
+        { hora: "11:40", intervalo: 11, bacterias: 14336, masa: "0.0000000000100352" },
+        { hora: "12:00", intervalo: 12, bacterias: 28672, masa: "0.0000000000200704" },
+        { hora: "12:20", intervalo: 13, bacterias: 57344, masa: "0.0000000000401408" },
+        { hora: "12:40", intervalo: 14, bacterias: 114688, masa: "0.0000000000802816" },
+        { hora: "13:00", intervalo: 15, bacterias: 229376, masa: "0.0000000001605632" },
+        { hora: "13:20", intervalo: 16, bacterias: 458752, masa: "0.0000000003211264" },
+        { hora: "13:40", intervalo: 17, bacterias: 917504, masa: "0.0000000006422528" },
+        { hora: "14:00", intervalo: 18, bacterias: 1835008, masa: "0.0000000012845056" },
+        { hora: "14:20", intervalo: 19, bacterias: 3670016, masa: "0.0000000025690112" },
+        { hora: "14:40", intervalo: 20, bacterias: 7340032, masa: "0.0000000051380224" },
+        { hora: "15:00", intervalo: 21, bacterias: 14680064, masa: "0.0000000102760448" },
+        { hora: "15:20", intervalo: 22, bacterias: 29360128, masa: "0.0000000205520896" },
+        { hora: "15:40", intervalo: 23, bacterias: 58720256, masa: "0.0000000411041792" },
+        { hora: "16:00", intervalo: 24, bacterias: 117440512, masa: "0.0000000822083584" },
+        { hora: "16:20", intervalo: 25, bacterias: 234881024, masa: "0.0000001644167168" },
+        { hora: "16:40", intervalo: 26, bacterias: 469762048, masa: "0.0000003288334336" },
+        { hora: "17:00", intervalo: 27, bacterias: 939524096, masa: "0.0000006576668672" },
+        { hora: "17:20", intervalo: 28, bacterias: 1879048192, masa: "0.000001315333734" },
+        { hora: "17:40", intervalo: 29, bacterias: 3758096384, masa: "0.000002630667469" },
+        { hora: "18:00", intervalo: 30, bacterias: 7516192768, masa: "0.000005261334938" },
+        { hora: "18:20", intervalo: 31, bacterias: 15032385536, masa: "0.00001052266988" },
+        { hora: "18:40", intervalo: 32, bacterias: 30064771072, masa: "0.00002104533975" },
+        { hora: "19:00", intervalo: 33, bacterias: 60129542144, masa: "0.0000420906795" },
+        { hora: "19:20", intervalo: 34, bacterias: 120259084288, masa: "0.000084181359" },
+        { hora: "19:40", intervalo: 35, bacterias: 240518168576, masa: "0.000168362718" },
+        { hora: "20:00", intervalo: 36, bacterias: 481036337152, masa: "0.000336725436" },
+        { hora: "20:20", intervalo: 37, bacterias: 962072674304, masa: "0.000673450872" },
+        { hora: "20:40", intervalo: 38, bacterias: 1924145348608, masa: "0.001346901744" },
+        { hora: "21:00", intervalo: 39, bacterias: 3848290697216, masa: "0.002693803488" },
+        { hora: "21:20", intervalo: 40, bacterias: 7696581394432, masa: "0.005387606976" },
+        { hora: "21:40", intervalo: 41, bacterias: 15393162788864, masa: "0.01077521395" },
+        { hora: "22:00", intervalo: 42, bacterias: 30786325577728, masa: "0.0215504279" },
+        { hora: "22:20", intervalo: 43, bacterias: 61572651155456, masa: "0.04310085581" },
+        { hora: "22:40", intervalo: 44, bacterias: 123145302310912, masa: "0.08620171162" },
+        { hora: "23:00", intervalo: 45, bacterias: 246290604621824, masa: "0.1724034232" },
+        { hora: "23:20", intervalo: 46, bacterias: 492581209243648, masa: "0.3448068465" },
+        { hora: "23:40", intervalo: 47, bacterias: 985162418487296, masa: "0.6896136929" },
+        { hora: "0:00", intervalo: 48, bacterias: "1.97E+15", masa: "1.379227386" },
+        { hora: "0:20", intervalo: 49, bacterias: "3.94E+15", masa: "2.758454772" },
+        { hora: "0:40", intervalo: 50, bacterias: "7.88E+15", masa: "5.516909544" },
+        { hora: "1:00", intervalo: 51, bacterias: "1.58E+16", masa: "11.03381909" },
+        { hora: "1:20", intervalo: 52, bacterias: "3.15E+16", masa: "22.06763817" },
+        { hora: "1:40", intervalo: 53, bacterias: "6.31E+16", masa: "44.13527635" },
+        { hora: "2:00", intervalo: 54, bacterias: "1.26E+17", masa: "88.2705527" },
+        { hora: "2:20", intervalo: 55, bacterias: "2.52E+17", masa: "176.5411054" },
+        { hora: "2:40", intervalo: 56, bacterias: "5.04E+17", masa: "353.0822108" },
+        { hora: "3:00", intervalo: 57, bacterias: "1.01E+18", masa: "706.1644216" },
+        { hora: "3:20", intervalo: 58, bacterias: "2.02E+18", masa: "1412.328843" },
+        { hora: "3:40", intervalo: 59, bacterias: "4.04E+18", masa: "2824.657686" },
+        { hora: "4:00", intervalo: 60, bacterias: "8.07E+18", masa: "5649.315373" },
+        { hora: "4:20", intervalo: 61, bacterias: "1.61E+19", masa: "11298.63075" },
+        { hora: "4:40", intervalo: 62, bacterias: "3.23E+19", masa: "22597.26149" },
+        { hora: "5:00", intervalo: 63, bacterias: "6.46E+19", masa: "45194.52298" },
+        { hora: "5:20", intervalo: 64, bacterias: "1.29E+20", masa: "90389.04596" },
+        { hora: "5:40", intervalo: 65, bacterias: "2.58E+20", masa: "180778.0919" },
+        { hora: "6:00", intervalo: 66, bacterias: "5.17E+20", masa: "361556.1838" },
+        { hora: "6:20", intervalo: 67, bacterias: "1.03E+21", masa: "723112.3677" },
+        { hora: "6:40", intervalo: 68, bacterias: "2.07E+21", masa: "1446224.735" },
+        { hora: "7:00", intervalo: 69, bacterias: "4.13E+21", masa: "2892449.471" },
+        { hora: "7:20", intervalo: 70, bacterias: "8.26E+21", masa: "5784898.942" },
+        { hora: "7:40", intervalo: 71, bacterias: "1.65E+22", masa: "11569797.88" },
+        { hora: "8:00", intervalo: 72, bacterias: "3.31E+22", masa: "23139595.77" }
+    ];
+    
+    const tablaBody = document.querySelector('#datos-tabla tbody');
+    if (!tablaBody) return;
+    
+    // Limpiar contenido existente
+    tablaBody.innerHTML = '';
+    
+    // Poblar la tabla con los datos
+    datos.forEach(fila => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${fila.hora}</td>
+            <td>${fila.intervalo}</td>
+            <td>${fila.bacterias}</td>
+            <td>${fila.masa}</td>
+        `;
+        tablaBody.appendChild(tr);
+    });
 }
 
 // Animaciones de scroll
@@ -353,7 +545,7 @@ function inicializarAnimaciones() {
     }, observerOptions);
 
     // Observar elementos para animación
-    document.querySelectorAll('.calc-card, .method-card, .process-step, .app-item').forEach(el => {
+    document.querySelectorAll('.calc-card, .method-card, .process-step, .app-item, .data-item, .r0-item').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
@@ -375,6 +567,10 @@ function inicializarNavegacion() {
                     top: offsetTop,
                     behavior: 'smooth'
                 });
+                
+                // Agregar efecto visual al enlace
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
             }
         });
     });
@@ -383,13 +579,15 @@ function inicializarNavegacion() {
 // Efectos visuales interactivos
 function inicializarEfectosVisuales() {
     // Efecto hover en tarjetas
-    document.querySelectorAll('.calc-card, .method-card, .app-item').forEach(card => {
+    document.querySelectorAll('.calc-card, .method-card, .app-item, .data-item, .r0-item, .process-step').forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px) scale(1.02)';
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+            this.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
         });
         
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '';
         });
     });
 
@@ -400,6 +598,8 @@ function inicializarEfectosVisuales() {
 // Crear efecto de partículas
 function crearParticulas() {
     const header = document.querySelector('.header');
+    if (!header) return;
+    
     const particulasContainer = document.createElement('div');
     particulasContainer.style.cssText = `
         position: absolute;
@@ -413,18 +613,19 @@ function crearParticulas() {
     
     header.appendChild(particulasContainer);
     
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 30; i++) {
         const particula = document.createElement('div');
         particula.style.cssText = `
             position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.4);
             border-radius: 50%;
             left: ${Math.random() * 100}%;
             top: ${Math.random() * 100}%;
-            animation: flotar ${3 + Math.random() * 4}s ease-in-out infinite;
-            animation-delay: ${Math.random() * 2}s;
+            animation: flotar ${4 + Math.random() * 6}s ease-in-out infinite;
+            animation-delay: ${Math.random() * 3}s;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         `;
         
         particulasContainer.appendChild(particula);
@@ -434,8 +635,8 @@ function crearParticulas() {
     const style = document.createElement('style');
     style.textContent = `
         @keyframes flotar {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.8; }
         }
     `;
     document.head.appendChild(style);
@@ -476,6 +677,10 @@ function inicializarCalculadoraCOVID() {
 
 // Función de utilidad para mostrar notificaciones
 function mostrarNotificacion(mensaje, tipo = 'info') {
+    // Remover notificaciones existentes
+    const notificacionesExistentes = document.querySelectorAll('.notificacion');
+    notificacionesExistentes.forEach(n => n.remove());
+    
     const notificacion = document.createElement('div');
     notificacion.className = `notificacion notificacion-${tipo}`;
     notificacion.textContent = mensaje;
@@ -485,12 +690,15 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
         right: 20px;
         background: ${tipo === 'error' ? '#ef4444' : tipo === 'success' ? '#10b981' : '#3b82f6'};
         color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        padding: 1.2rem 1.8rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         z-index: 1000;
         transform: translateX(100%);
         transition: transform 0.3s ease;
+        font-weight: 600;
+        font-size: 1.1rem;
+        max-width: 300px;
     `;
     
     document.body.appendChild(notificacion);
@@ -504,7 +712,9 @@ function mostrarNotificacion(mensaje, tipo = 'info') {
     setTimeout(() => {
         notificacion.style.transform = 'translateX(100%)';
         setTimeout(() => {
-            document.body.removeChild(notificacion);
+            if (notificacion.parentNode) {
+                notificacion.parentNode.removeChild(notificacion);
+            }
         }, 300);
     }, 3000);
 }
@@ -550,32 +760,45 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar todos los componentes
     inicializarSimulador();
-    crearGraficoCrecimiento();
+    // crearGraficoCrecimiento(); // Removido ya que no se necesita
     inicializarSimuladorInteractivo();
     inicializarAnimaciones();
     inicializarNavegacion();
     inicializarEfectosVisuales();
     inicializarCalculadoraCOVID();
+    poblarTablaDatos(); // Agregado para poblar la tabla con datos
     
     // Agregar botón de exportación
     const simulateBtn = document.getElementById('simular');
-    const exportBtn = document.createElement('button');
-    exportBtn.textContent = '📊 Exportar Datos';
-    exportBtn.className = 'export-btn';
-    exportBtn.style.cssText = `
-        background: var(--secondary-color);
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        cursor: pointer;
-        margin-top: 1rem;
-        width: 100%;
-        transition: background 0.3s ease;
-    `;
-    exportBtn.addEventListener('click', exportarDatos);
-    simulateBtn.parentNode.appendChild(exportBtn);
+    if (simulateBtn) {
+        const exportBtn = document.createElement('button');
+        exportBtn.textContent = '📊 Exportar Datos';
+        exportBtn.className = 'export-btn';
+        exportBtn.style.cssText = `
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            font-size: 1.1rem;
+        `;
+        exportBtn.addEventListener('click', exportarDatos);
+        exportBtn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+            this.style.boxShadow = 'var(--shadow-lg)';
+        });
+        exportBtn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'var(--shadow-md)';
+        });
+        simulateBtn.parentNode.appendChild(exportBtn);
+    }
     
     // Mostrar notificación de bienvenida
     setTimeout(() => {
@@ -609,19 +832,20 @@ function actualizarEstadisticas() {
             bottom: 20px;
             left: 20px;
             background: var(--surface-color);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow-md);
+            padding: 1.2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-lg);
             border: 1px solid var(--border-color);
             z-index: 1000;
-            font-size: 0.9rem;
-            max-width: 250px;
+            font-size: 0.95rem;
+            max-width: 280px;
+            backdrop-filter: blur(10px);
         `;
         document.body.appendChild(statsElement);
     }
     
     statsElement.innerHTML = `
-        <h4 style="margin-bottom: 0.5rem; color: var(--primary-color);">📊 Datos de Referencia</h4>
+        <h4 style="margin-bottom: 0.8rem; color: var(--primary-color); font-weight: 700;">📊 Datos de Referencia</h4>
         <p><strong>Bacterias para igualar masa terrestre:</strong><br>${formatScientific(stats.bacteriasEnTierra)}</p>
         <p><strong>Masa por bacteria:</strong><br>${formatScientific(stats.masaPorBacteria)} kg</p>
         <p><strong>Tiempo de duplicación:</strong><br>${stats.tiempoParaDuplicar} minutos</p>

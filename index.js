@@ -1,5 +1,6 @@
 // Configuración global
 const MASSA_TERRA = 6e15; // kg
+const MASSA_LUNA = 7.34e22; // kg
 const MASSA_BACTERIA = 7e-16; // kg
 
 // Función para formatear números científicos
@@ -72,51 +73,82 @@ function inicializarSimulador() {
     }
 }
 
-// Crear gráfico de crecimiento
-function crearGraficoCrecimiento() {
-    const ctx = document.getElementById('growthChart').getContext('2d');
+// Poblar tabla de bacterias Escherichia coli
+function poblarTablaBacterias() {
+    const tablaBody = document.querySelector('#bacteriaTable tbody');
+    if (!tablaBody) return;
     
-    // Generar datos para el gráfico
-    const tiempoMax = 2880; // 2 días en minutos
-    const intervalos = [20, 30, 40]; // Diferentes intervalos de duplicación
-    const datasets = [];
-    let labels = [];
+    // Limpiar contenido existente
+    tablaBody.innerHTML = '';
     
-    intervalos.forEach((intervalo, index) => {
-        const data = [];
+    // Generar datos para la tabla (basado en la imagen mostrada)
+    // Los datos muestran crecimiento exponencial donde las bacterias empiezan a crecer significativamente alrededor del intervalo 20
+    for (let i = 0; i <= 28; i++) {
+        const tr = document.createElement('tr');
         
-        for (let tiempo = 0; tiempo <= tiempoMax; tiempo += 120) { // Cada 2 horas
-            const resultado = calcularCrecimiento(tiempo, intervalo);
-            data.push(Math.log10(resultado.poblacionFinal));
-            if (index === 0) { // Solo guardar etiquetas una vez
-                labels.push(`${(tiempo / 60).toFixed(1)}h`);
-            }
+        let numeroBacterias;
+        if (i < 20) {
+            // Para los primeros intervalos, el número es muy pequeño (cerca de 0)
+            numeroBacterias = Math.pow(2, i);
+        } else {
+            // A partir del intervalo 20, el crecimiento se vuelve más visible
+            numeroBacterias = Math.pow(2, i);
         }
         
-        datasets.push({
-            label: `Duplicación cada ${intervalo} min`,
-            data: data,
-            borderColor: ['#3b82f6', '#10b981', '#f59e0b'][index],
-            backgroundColor: ['rgba(59, 130, 246, 0.1)', 'rgba(16, 185, 129, 0.1)', 'rgba(245, 158, 11, 0.1)'][index],
-            tension: 0.4,
-            fill: false,
-            pointRadius: 4,
-            pointHoverRadius: 6
-        });
-    });
+        // Formatear el número de bacterias
+        let bacteriasFormateadas;
+        if (numeroBacterias < 1000) {
+            bacteriasFormateadas = numeroBacterias.toString();
+        } else if (numeroBacterias < 1000000) {
+            bacteriasFormateadas = (numeroBacterias / 1000).toFixed(0) + ',000';
+        } else {
+            bacteriasFormateadas = (numeroBacterias / 1000000).toFixed(0) + ',000,000';
+        }
+        
+        tr.innerHTML = `
+            <td>${i}</td>
+            <td>${bacteriasFormateadas}</td>
+        `;
+        tablaBody.appendChild(tr);
+    }
+}
+
+// Crear gráfica de COVID-19
+function crearGraficaCOVID() {
+    const ctx = document.getElementById('covidChart');
+    if (!ctx) return;
     
-    new Chart(ctx, {
+    const canvas = ctx.getContext('2d');
+    
+    // Datos del COVID-19 (crecimiento exponencial con R0 = 20)
+    const dias = ['Lunes (0)', 'Martes (1)', 'Miércoles (2)', 'Jueves (3)', 'Viernes (4)', 'Sábado (5)', 'Domingo (6)', 'Lunes (7)'];
+    const infectados = [1, 20, 400, 8000, 160000, 3200000, 64000000, 1280000000];
+    
+    new Chart(canvas, {
         type: 'line',
         data: {
-            labels: labels,
-            datasets: datasets
+            labels: dias,
+            datasets: [{
+                label: 'Número de Infectados',
+                data: infectados,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#ef4444',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2
+            }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 title: {
                     display: true,
-                    text: 'Crecimiento Exponencial de Bacterias',
+                    text: 'Propagación del COVID-19',
                     font: {
                         size: 18,
                         weight: 'bold'
@@ -138,7 +170,7 @@ function crearGraficoCrecimiento() {
                 x: {
                     title: {
                         display: true,
-                        text: 'Tiempo (horas)',
+                        text: 'Tiempo (días)',
                         font: {
                             size: 14,
                             weight: 'bold'
@@ -151,15 +183,16 @@ function crearGraficoCrecimiento() {
                 y: {
                     title: {
                         display: true,
-                        text: 'Log₁₀ (Número de Bacterias)',
+                        text: 'Número de Infectados',
                         font: {
                             size: 14,
                             weight: 'bold'
                         }
                     },
+                    type: 'logarithmic',
                     ticks: {
                         callback: function(value) {
-                            return `10^${value}`;
+                            return formatScientific(value);
                         },
                         font: {
                             size: 12
@@ -196,12 +229,12 @@ function inicializarSimuladorInteractivo() {
         const finalPoblacion = document.getElementById('final-poblacion');
         const totalDivisiones = document.getElementById('total-divisiones');
         const masaSimulada = document.getElementById('masa-simulada');
-        const comparacionTierra = document.getElementById('comparacion-tierra');
+        const comparacionLuna = document.getElementById('comparacion-luna');
         
         // Verificar que todos los elementos existen
         if (!tiempoSlider || !intervaloSlider || !poblacionInput || !simularBtn ||
             !tiempoValor || !intervaloValor || !finalPoblacion || !totalDivisiones ||
-            !masaSimulada || !comparacionTierra) {
+            !masaSimulada || !comparacionLuna) {
             console.warn('Algunos elementos del simulador interactivo no se encontraron');
             return;
         }
@@ -232,11 +265,11 @@ function inicializarSimuladorInteractivo() {
                     totalDivisiones.textContent = Math.round(resultado.divisiones);
                     masaSimulada.textContent = `${formatScientific(resultado.masaTotal)} kg`;
                     
-                    const ratioTierra = resultado.masaTotal / MASSA_TERRA;
-                    if (ratioTierra >= 1) {
-                        comparacionTierra.textContent = `${formatScientific(ratioTierra)} veces la masa terrestre`;
+                    const ratioLuna = resultado.masaTotal / MASSA_LUNA;
+                    if (ratioLuna >= 1) {
+                        comparacionLuna.textContent = `${formatScientific(ratioLuna)} veces la masa lunar`;
                     } else {
-                        comparacionTierra.textContent = `${(ratioTierra * 100).toFixed(2)}% de la masa terrestre`;
+                        comparacionLuna.textContent = `${(ratioLuna * 100).toFixed(2)}% de la masa lunar`;
                     }
                     
                     // Restaurar botón
@@ -760,13 +793,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar todos los componentes
     inicializarSimulador();
-    // crearGraficoCrecimiento(); // Removido ya que no se necesita
     inicializarSimuladorInteractivo();
     inicializarAnimaciones();
     inicializarNavegacion();
     inicializarEfectosVisuales();
     inicializarCalculadoraCOVID();
-    poblarTablaDatos(); // Agregado para poblar la tabla con datos
+    calcularBacteriasLuna(); // Calcular bacterias para masa lunar
     
     // Agregar botón de exportación
     const simulateBtn = document.getElementById('simular');
@@ -814,10 +846,21 @@ window.addEventListener('error', function(e) {
     mostrarNotificacion('Ha ocurrido un error en la aplicación', 'error');
 });
 
+// Función para calcular bacterias que superan la masa de la Luna
+function calcularBacteriasLuna() {
+    const bacteriasLuna = MASSA_LUNA / MASSA_BACTERIA;
+    const elementoLuna = document.getElementById('moon-bacteria-count');
+    if (elementoLuna) {
+        elementoLuna.textContent = formatScientific(bacteriasLuna);
+    }
+    return bacteriasLuna;
+}
+
 // Función para actualizar estadísticas en tiempo real
 function actualizarEstadisticas() {
     const stats = {
         bacteriasEnTierra: MASSA_TERRA / MASSA_BACTERIA,
+        bacteriasEnLuna: MASSA_LUNA / MASSA_BACTERIA,
         tiempoParaDuplicar: 20, // minutos
         masaPorBacteria: MASSA_BACTERIA
     };
@@ -847,6 +890,7 @@ function actualizarEstadisticas() {
     statsElement.innerHTML = `
         <h4 style="margin-bottom: 0.8rem; color: var(--primary-color); font-weight: 700;">📊 Datos de Referencia</h4>
         <p><strong>Bacterias para igualar masa terrestre:</strong><br>${formatScientific(stats.bacteriasEnTierra)}</p>
+        <p><strong>Bacterias para igualar masa lunar:</strong><br>${formatScientific(stats.bacteriasEnLuna)}</p>
         <p><strong>Masa por bacteria:</strong><br>${formatScientific(stats.masaPorBacteria)} kg</p>
         <p><strong>Tiempo de duplicación:</strong><br>${stats.tiempoParaDuplicar} minutos</p>
     `;

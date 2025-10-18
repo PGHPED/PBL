@@ -1347,3 +1347,38 @@ html {
         --border-color: #334155;
     }
 }
+
+/* Estilos para captura de pantalla */
+.screenshot-section {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.screenshot-container {
+    background: var(--surface-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.screenshot-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease;
+}
+
+.screenshot-image:hover {
+    transform: scale(1.02);
+}
+
+.screenshot-description {
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-top: 1rem;
+    font-size: 1rem;
+}

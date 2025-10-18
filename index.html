@@ -38,6 +38,7 @@
                     
                     <h3>Problema Reformulado</h3>
                     <p>Si una bacteria tarda 20 minutos en multiplicar su cantidad por dos, y al cabo de 2 días superaría la masa de la Tierra, ¿cuánta masa tendrá una sola bacteria?</p>
+                    <p><strong>Número de bacterias cuando supera la masa de la Tierra: 9,53E+39 bacterias</strong></p>
                     
                     <div class="data-grid">
                         <div class="data-item">
@@ -47,7 +48,7 @@
                             <strong>Tiempo total:</strong> 2 días (2,880 minutos)
                         </div>
                         <div class="data-item">
-                            <strong>Masa de la Tierra:</strong> 6×10¹⁵ kg
+                            <strong>Masa de la Luna:</strong> 7.34×10²² kg
                         </div>
                         <div class="data-item">
                             <strong>Masa de una bacteria:</strong> 7×10⁻¹⁶ kg
@@ -57,72 +58,40 @@
             </div>
         </section>
 
-        <!-- Tabla de Bacteria -->
+        <!-- Gráficas de Bacterias y COVID-19 -->
         <section id="calculos" class="section">
             <div class="container">
-                <h2 class="section-title">📊 Tabla de Bacteria</h2>
+                <h2 class="section-title">📊 Análisis Gráfico</h2>
                 
-                <div class="table-container">
-                    <table id="datos-tabla" class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Hora</th>
-                                <th>Intervalos de 20 minutos</th>
-                                <th>Número de Bacterias</th>
-                                <th>Masa (kg)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Data will be populated by JavaScript -->
-                        </tbody>
-                    </table>
+                <!-- Captura de Pantalla -->
+                <div class="screenshot-section">
+                    <h3>📊 Análisis de Datos</h3>
+                    <div class="screenshot-container">
+                        <img src="screenshot.png" 
+                             alt="Captura de pantalla del análisis" 
+                             class="screenshot-image">
+                    </div>
+                    <p class="screenshot-description">Análisis completo del crecimiento bacteriano y propagación viral</p>
                 </div>
                 
-                <div class="covid-data">
-                    <h3>🦠 Tabla de COVID-19</h3>
-                    <div class="table-container">
-                        <table id="covid-tabla" class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Días</th>
-                                    <th>Número de Infectados</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Lunes (0)</td>
-                                    <td>1</td>
-                                </tr>
-                                <tr>
-                                    <td>Martes (1)</td>
-                                    <td>20</td>
-                                </tr>
-                                <tr>
-                                    <td>Miércoles (2)</td>
-                                    <td>400</td>
-                                </tr>
-                                <tr>
-                                    <td>Jueves (3)</td>
-                                    <td>8,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Viernes (4)</td>
-                                    <td>160,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Sábado (5)</td>
-                                    <td>3,200,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Domingo (6)</td>
-                                    <td>64,000,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Lunes (7)</td>
-                                    <td>1,280,000,000</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Información adicional -->
+                <div class="additional-info">
+                    <div class="info-card">
+                        <h4>📈 Datos Clave</h4>
+                        <div class="data-grid">
+                            <div class="data-item">
+                                <strong>Masa de la Luna:</strong> 7.34×10²² kg
+                            </div>
+                            <div class="data-item">
+                                <strong>Bacterias para superar masa lunar:</strong> <span id="moon-bacteria-count">Calculando...</span>
+                            </div>
+                            <div class="data-item">
+                                <strong>Tiempo de duplicación:</strong> 20 minutos
+                            </div>
+                            <div class="data-item">
+                                <strong>Masa de una bacteria:</strong> 7×10⁻¹⁶ kg
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -301,7 +270,7 @@
                             <p>Población final: <span id="final-poblacion">-</span></p>
                             <p>Número de divisiones: <span id="total-divisiones">-</span></p>
                             <p>Masa total: <span id="masa-simulada">-</span></p>
-                            <p>Comparación con masa terrestre: <span id="comparacion-tierra">-</span></p>
+                            <p>Comparación con masa lunar: <span id="comparacion-luna">-</span></p>
                         </div>
                     </div>
                 </div>

@@ -1,304 +1,514 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proyecto: Nos Atacan Virus y Bacterias</title>
-    <link rel="stylesheet" href="index.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <header class="header">
-        <div class="container">
-            <h1 class="title">🦠 Proyecto: Nos Atacan Virus y Bacterias</h1>
-            <p class="subtitle">Análisis del crecimiento exponencial de COVID-19 y comunicación bacteriana</p>
-        </div>
-    </header>
+// Configuración global
+const MASSA_TERRA = 6e24; // kg (masa de la Tierra aproximada)
+const MASSA_LUNA = 7.34e22; // kg
+const MASSA_BACTERIA = 7e-16; // kg
 
-    <nav class="navigation">
-        <div class="container">
-            <ul class="nav-list">
-                <li><a href="#problema" class="nav-link">🎯 Problema Principal</a></li>
-                <li><a href="#calculos" class="nav-link">📊 Cálculos COVID-19</a></li>
-                <li><a href="#quorum" class="nav-link">🧬 Quorum Sensing</a></li>
-                <li><a href="#simulacion" class="nav-link">🎮 Simulación</a></li>
-            </ul>
-        </div>
-    </nav>
+// Función para formatear números científicos
+function formatScientific(num) {
+    if (num >= 1e6 || num <= 1e-6) {
+        return num.toExponential(2);
+    }
+    return num.toLocaleString('es-ES', { maximumFractionDigits: 2 });
+}
 
-    <main class="main">
-        <!-- Problema Principal -->
-        <section id="problema" class="section">
-            <div class="container">
-                <h2 class="section-title">🎯 Comprensión del Problema</h2>
-                <div class="problem-card">
-                    <h3>Problema</h3>
-                    <p>Si una bacteria Escherichia coli tarda 20 minutos en multiplicar su cantidad por dos, y al cabo de 2 días superaría la masa de la Tierra, ¿cuánta masa tendrá una sola bacteria?</p>
-                    <p><strong>Número de bacterias cuando supera la masa de la Tierra: 9.53E+39 bacterias</strong></p>
+// Función para calcular crecimiento exponencial
+function calcularCrecimiento(tiempoMin, intervaloMin, poblacionInicial = 1) {
+    const divisiones = tiempoMin / intervaloMin;
+    const poblacionFinal = poblacionInicial * Math.pow(2, divisiones);
+    const masaTotal = poblacionFinal * MASSA_BACTERIA;
+    
+    return {
+        divisiones: divisiones,
+        poblacionFinal: poblacionFinal,
+        masaTotal: masaTotal
+    };
+}
+
+// Inicializar simulador principal
+function inicializarSimulador() {
+    try {
+        const tiempoSlider = document.getElementById('tiempo');
+        const intervaloSlider = document.getElementById('intervalo');
+        const tiempoValor = document.getElementById('tiempo-valor');
+        const intervaloValor = document.getElementById('intervalo-valor');
+        const numeroBacterias = document.getElementById('numero-bacterias');
+        const masaTotal = document.getElementById('masa-total');
+        
+        // Verificar que todos los elementos existen
+        if (!tiempoSlider || !intervaloSlider || !tiempoValor || !intervaloValor || 
+            !numeroBacterias || !masaTotal) {
+            console.warn('Algunos elementos del simulador principal no se encontraron');
+            return;
+        }
+
+        function actualizarCalculos() {
+            const tiempo = parseInt(tiempoSlider.value);
+            const intervalo = parseInt(intervaloSlider.value);
+            
+            tiempoValor.textContent = `${tiempo} min`;
+            intervaloValor.textContent = `${intervalo} min`;
+            
+            const resultado = calcularCrecimiento(tiempo, intervalo);
+            
+            numeroBacterias.textContent = formatScientific(resultado.poblacionFinal);
+            masaTotal.textContent = `${formatScientific(resultado.masaTotal)} kg`;
+            
+            // Agregar animación suave
+            numeroBacterias.style.transform = 'scale(1.05)';
+            masaTotal.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                numeroBacterias.style.transform = 'scale(1)';
+                masaTotal.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        tiempoSlider.addEventListener('input', actualizarCalculos);
+        intervaloSlider.addEventListener('input', actualizarCalculos);
+        
+        // Inicializar con valores por defecto
+        actualizarCalculos();
+    } catch (error) {
+        console.error('Error al inicializar el simulador principal:', error);
+        mostrarNotificacion('Error al inicializar el simulador principal', 'error');
+    }
+}
+
+// Crear gráfica de bacterias Escherichia coli
+function crearGraficaBacterias() {
+    // This function is no longer needed as we're using the imagen.png file instead
+}
+
+// Crear gráfica de COVID-19
+function crearGraficaCOVID() {
+    // This function is no longer needed as we're using the imagen.png file instead
+}
+
+// Simulador interactivo
+function inicializarSimuladorInteractivo() {
+    try {
+        const tiempoSlider = document.getElementById('sim-tiempo');
+        const intervaloSlider = document.getElementById('sim-intervalo');
+        const poblacionInput = document.getElementById('sim-poblacion');
+        const simularBtn = document.getElementById('simular');
+        
+        const tiempoValor = document.getElementById('sim-tiempo-valor');
+        const intervaloValor = document.getElementById('sim-intervalo-valor');
+        
+        const finalPoblacion = document.getElementById('final-poblacion');
+        const totalDivisiones = document.getElementById('total-divisiones');
+        const masaSimulada = document.getElementById('masa-simulada');
+        const comparacionLuna = document.getElementById('comparacion-luna');
+        
+        // Verificar que todos los elementos existen
+        if (!tiempoSlider || !intervaloSlider || !poblacionInput || !simularBtn ||
+            !tiempoValor || !intervaloValor || !finalPoblacion || !totalDivisiones ||
+            !masaSimulada || !comparacionLuna) {
+            console.warn('Algunos elementos del simulador interactivo no se encontraron');
+            return;
+        }
+
+        function actualizarValores() {
+            const tiempo = parseFloat(tiempoSlider.value);
+            const intervalo = parseInt(intervaloSlider.value);
+            
+            tiempoValor.textContent = `${tiempo} días`;
+            intervaloValor.textContent = `${intervalo} min`;
+        }
+
+        function ejecutarSimulacion() {
+            try {
+                // Agregar efecto visual al botón
+                simularBtn.textContent = ' simulando...';
+                simularBtn.disabled = true;
+                
+                // Simular carga
+                setTimeout(() => {
+                    const tiempo = parseFloat(tiempoSlider.value) * 24 * 60; // Convertir días a minutos
+                    const intervalo = parseInt(intervaloSlider.value);
+                    const poblacionInicial = parseInt(poblacionInput.value) || 1;
                     
-                    <div class="data-grid">
-                        <div class="data-item">
-                            <strong>⏱️ Tiempo de duplicación:</strong> 20 minutos
-                        </div>
-                        <div class="data-item">
-                            <strong>📅 Tiempo total:</strong> 2 días (2,880 minutos)
-                        </div>
-                        <div class="data-item">
-                            <strong>🌕 Masa de la Luna:</strong> 7.34×10²² kg
-                        </div>
-                        <div class="data-item">
-                            <strong>🦠 Bacterias que superan la masa de la Luna:</strong> <span id="moon-bacteria-count">Calculando...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Gráficas de Bacterias y COVID-19 -->
-        <section id="calculos" class="section">
-            <div class="container">
-                <h2 class="section-title">📊 Análisis Gráfico</h2>
-                
-                <!-- Captura de Pantalla -->
-                <div class="screenshot-section">
-                    <h3>📊 Análisis de Datos</h3>
-                    <div class="screenshot-container">
-                        <img src="imagen.png" 
-                             alt="Captura de pantalla del análisis" 
-                             class="screenshot-image">
-                    </div>
-                    <p class="screenshot-description">Análisis completo del crecimiento bacteriano y propagación viral</p>
-                </div>
-                
-                <!-- Datos de Referencia moved here -->
-                <div class="card" id="reference-data">
-                    <div class="card-header">
-                        <div class="card-icon">📈</div>
-                        <h3>Datos Clave</h3>
-                        <button id="toggle-reference" class="toggle-btn">Ocultar Datos</button>
-                    </div>
-                    <div class="data-grid">
-                        <div class="data-item">
-                            <strong>🌍 Bacterias para igualar masa terrestre:</strong><br><span id="earth-bacteria-count">8.57e+39</span>
-                        </div>
-                        <div class="data-item">
-                            <strong>🌕 Bacterias para igualar masa lunar:</strong><br><span id="moon-bacteria-count-2">1.05e+38</span>
-                        </div>
-                        <div class="data-item">
-                            <strong>🦠 Masa por bacteria:</strong><br>7.00e-16 kg
-                        </div>
-                        <div class="data-item">
-                            <strong>⏱️ Tiempo de duplicación:</strong><br>20 minutos
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Transmisión COVID-19 -->
-        <section class="section">
-            <div class="container">
-                <h2 class="section-title">🦠 Transmisión del COVID-19</h2>
-                
-                <div class="transmission-methods">
-                    <div class="method-card">
-                        <div class="card-header">
-                            <div class="card-icon">💧</div>
-                            <h3>Gotas Respiratorias</h3>
-                        </div>
-                        <p>Partículas de más de 5 micrómetros que se depositan rápidamente por gravedad.</p>
-                        <ul>
-                            <li>📏 Distancia de transmisión: 1-2 metros</li>
-                            <li>⏱️ Duración en el aire: Pocos segundos</li>
-                        </ul>
-                    </div>
-
-                    <div class="method-card">
-                        <div class="card-header">
-                            <div class="card-icon">🌪️</div>
-                            <h3>Aerosoles</h3>
-                        </div>
-                        <p>Partículas menores a 5 micrómetros que permanecen suspendidas en el aire.</p>
-                        <ul>
-                            <li>📏 Distancia de transmisión: Más de 2 metros</li>
-                            <li>⏱️ Duración en el aire: Minutos a horas</li>
-                        </ul>
-                    </div>
-
-                    <div class="method-card">
-                        <div class="card-header">
-                            <div class="card-icon">🤝</div>
-                            <h3>Contacto Directo</h3>
-                        </div>
-                        <p>Transmisión por contacto con superficies contaminadas o contacto directo.</p>
-                        <ul>
-                            <li>📅 Supervivencia en superficies: Horas a días</li>
-                            <li>🌡️ Factores: Material, temperatura, humedad</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="r0-info">
-                    <h3>🔢 Número Básico de Reproducción (R₀)</h3>
-                    <p>El R₀ representa el número promedio de personas que una persona infectada puede contagiar en una población completamente susceptible.</p>
-                    <div class="r0-values">
-                        <div class="r0-item">
-                            <strong>🦠 COVID-19 original:</strong> R₀ ≈ 2.5-3.0
-                        </div>
-                        <div class="r0-item">
-                            <strong>🦠 Variante Delta:</strong> R₀ ≈ 5-8
-                        </div>
-                        <div class="r0-item">
-                            <strong>🦠 Variante Ómicron:</strong> R₀ ≈ 8-12
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Quorum Sensing -->
-        <section id="quorum" class="section">
-            <div class="container">
-                <h2 class="section-title">🧬 Percepción de Quorum Bacteriana</h2>
-                
-                <div class="quorum-intro">
-                    <p>La percepción de quorum es un mecanismo mediante el cual las bacterias regulan la expresión de sus genes en función de la densidad celular.</p>
-                </div>
-
-                <div class="quorum-process">
-                    <div class="process-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h3>🏭 Producción de Autoinductores</h3>
-                            <p>Las bacterias producen y liberan moléculas señal llamadas autoinductores al medio ambiente.</p>
-                        </div>
-                    </div>
-
-                    <div class="process-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h3>📡 Detección de Concentración</h3>
-                            <p>Cuando la concentración de autoinductores alcanza un umbral crítico, las bacterias detectan estos autoinductores mediante receptores específicos.</p>
-                        </div>
-                    </div>
-
-                    <div class="process-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h3>🔄 Respuesta Coordinada</h3>
-                            <p>La unión de autoinductores desencadena cascadas de señalización que modulan la expresión de genes y actividades grupales.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quorum-applications">
-                    <h3>🔬 Aplicaciones de la Percepción de Quorum</h3>
-                    <div class="applications-grid">
-                        <div class="app-item">
-                            <span class="app-icon">💡</span>
-                            <strong>Producción de Luz</strong>
-                            <p>Como en Aliivibrio fischeri</p>
-                        </div>
-                        <div class="app-item">
-                            <span class="app-icon">🍽️</span>
-                            <strong>Adquisición de Nutrientes</strong>
-                            <p>Coordinación para obtener recursos</p>
-                        </div>
-                        <div class="app-item">
-                            <span class="app-icon">🔄</span>
-                            <strong>Conjugación Bacteriana</strong>
-                            <p>Intercambio de material genético</p>
-                        </div>
-                        <div class="app-item">
-                            <span class="app-icon">🛡️</span>
-                            <strong>Formación de Biofilms</strong>
-                            <p>Estructuras protectoras comunitarias</p>
-                        </div>
-                        <div class="app-item">
-                            <span class="app-icon">⚗️</span>
-                            <strong>Factores de Virulencia</strong>
-                            <p>Coordinación de patogenicidad</p>
-                        </div>
-                        <div class="app-item">
-                            <span class="app-icon">💊</span>
-                            <strong>Esporulación</strong>
-                            <p>Formación de esporas de resistencia</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="research-info">
-                    <h3>👨‍🔬 Investigación del Dr. Stephen J. Hagen</h3>
-                    <div class="research-card">
-                        <p>El Dr. Stephen J. Hagen estudia la dinámica de sistemas biológicos, enfocándose en:</p>
-                        <ul>
-                            <li><strong>🔬 Métodos ópticos con resolución temporal</strong> para procesos rápidos (nanosegundos a microsegundos)</li>
-                            <li><strong>🧬 Plegamiento y ensamblaje de proteínas y péptidos</strong></li>
-                            <li><strong>📡 Redes de regulación génica</strong> en señalización bacteriana</li>
-                            <li><strong>🌡️ Aspectos físicos del quorum sensing</strong>, incluyendo ruido y estocasticidad</li>
-                            <li><strong>📍 Límites espaciales y temporales</strong> de la comunicación bacteriana</li>
-                        </ul>
-                        <a href="https://people.clas.ufl.edu/sjhagen/" target="_blank" class="research-link">Ver perfil académico</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Simulación Interactiva -->
-        <section id="simulacion" class="section">
-            <div class="container">
-                <h2 class="section-title">🎮 Simulación Interactiva</h2>
-                
-                <div class="simulation-controls">
-                    <div class="control-group">
-                        <label for="sim-tiempo">📅 Tiempo de simulación (días):</label>
-                        <input type="range" id="sim-tiempo" min="0" max="10" value="2" step="0.1">
-                        <span id="sim-tiempo-valor">2 días</span>
-                    </div>
+                    const resultado = calcularCrecimiento(tiempo, intervalo, poblacionInicial);
                     
-                    <div class="control-group">
-                        <label for="sim-intervalo">⏱️ Intervalo de duplicación (minutos):</label>
-                        <input type="range" id="sim-intervalo" min="10" max="120" value="20" step="5">
-                        <span id="sim-intervalo-valor">20 min</span>
-                    </div>
+                    finalPoblacion.textContent = formatScientific(resultado.poblacionFinal);
+                    totalDivisiones.textContent = Math.round(resultado.divisiones);
+                    masaSimulada.textContent = `${formatScientific(resultado.masaTotal)} kg`;
                     
-                    <div class="control-group">
-                        <label for="sim-poblacion">🧮 Población inicial:</label>
-                        <input type="number" id="sim-poblacion" value="1" min="1" max="1000">
-                    </div>
+                    const ratioLuna = resultado.masaTotal / MASSA_LUNA;
+                    if (ratioLuna >= 1) {
+                        comparacionLuna.textContent = `${formatScientific(ratioLuna)} veces la masa lunar`;
+                    } else {
+                        comparacionLuna.textContent = `${(ratioLuna * 100).toFixed(2)}% de la masa lunar`;
+                    }
                     
-                    <button id="simular" class="simulate-btn">🚀 Simular Crecimiento</button>
-                </div>
+                    // Restaurar botón
+                    simularBtn.textContent = '🚀 Simular Crecimiento';
+                    simularBtn.disabled = false;
+                    
+                    // Crear gráfico
+                    crearGraficoSimulacion(tiempo, intervalo, poblacionInicial);
+                    
+                    // Mostrar notificación de éxito
+                    mostrarNotificacion('Simulación completada exitosamente', 'success');
+                }, 500);
+            } catch (error) {
+                console.error('Error al ejecutar la simulación:', error);
+                mostrarNotificacion('Error al ejecutar la simulación', 'error');
+                simularBtn.textContent = '🚀 Simular Crecimiento';
+                simularBtn.disabled = false;
+            }
+        }
 
-                <div class="simulation-results">
-                    <div class="result-card">
-                        <div class="card-header">
-                            <div class="card-icon">📊</div>
-                            <h3>Resultados de la Simulación</h3>
-                        </div>
-                        <div id="sim-results">
-                            <p>🧮 Población final: <span id="final-poblacion">-</span></p>
-                            <p>🔄 Número de divisiones: <span id="total-divisiones">-</span></p>
-                            <p>⚖️ Masa total: <span id="masa-simulada">-</span></p>
-                            <p>🌕 Comparación con masa lunar: <span id="comparacion-luna">-</span></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+        tiempoSlider.addEventListener('input', actualizarValores);
+        intervaloSlider.addEventListener('input', actualizarValores);
+        simularBtn.addEventListener('click', ejecutarSimulacion);
+        
+        // Inicializar valores
+        actualizarValores();
+        // Ejecutar simulación después de un breve delay para asegurar que el canvas esté listo
+        setTimeout(ejecutarSimulacion, 100);
+    } catch (error) {
+        console.error('Error al inicializar el simulador interactivo:', error);
+        mostrarNotificacion('Error al inicializar el simulador interactivo', 'error');
+    }
+}
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 Proyecto: Nos Atacan Virus y Bacterias. Análisis del crecimiento exponencial y comunicación microbiana.</p>
-            <div class="footer-links">
-                <a href="https://metode.es/revistas-metode/secciones/casa-microbios/la-lengua-de-las-bacterias-quorum-sensing.html" target="_blank">📚 Fuente: Quorum Sensing</a>
-                <a href="https://people.clas.ufl.edu/sjhagen/" target="_blank">👨‍🔬 Dr. Stephen J. Hagen</a>
-            </div>
-        </div>
-    </footer>
+// Crear gráfico de simulación
+function crearGraficoSimulacion(tiempoMax, intervalo, poblacionInicial) {
+    // This function is no longer needed as we're using the imagen.png file instead
+}
 
-    <script src="index.js"></script>
-</body>
-</html>
+// Función para poblar la tabla con datos del Google Spreadsheet
+function poblarTablaDatos() {
+    // This function is no longer needed as we're replacing the table with charts
+}
+
+// Animaciones de scroll
+function inicializarAnimaciones() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observar elementos para animación
+    document.querySelectorAll('.calc-card, .method-card, .process-step, .app-item, .data-item, .r0-item').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+}
+
+// Navegación suave
+function inicializarNavegacion() {
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetSection = document.querySelector(targetId);
+            
+            if (targetSection) {
+                const offsetTop = targetSection.offsetTop - 80; // Ajustar para navegación fija
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+                
+                // Agregar efecto visual al enlace
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            }
+        });
+    });
+}
+
+// Efectos visuales interactivos
+function inicializarEfectosVisuales() {
+    // Efecto hover en tarjetas
+    document.querySelectorAll('.calc-card, .method-card, .app-item, .data-item, .r0-item, .process-step').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+            this.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '';
+        });
+    });
+
+    // Efecto de partículas en el header
+    crearParticulas();
+}
+
+// Crear efecto de partículas
+function crearParticulas() {
+    const header = document.querySelector('.header');
+    if (!header) return;
+    
+    const particulasContainer = document.createElement('div');
+    particulasContainer.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    `;
+    
+    header.appendChild(particulasContainer);
+    
+    for (let i = 0; i < 30; i++) {
+        const particula = document.createElement('div');
+        particula.style.cssText = `
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            animation: flotar ${4 + Math.random() * 6}s ease-in-out infinite;
+            animation-delay: ${Math.random() * 3}s;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        `;
+        
+        particulasContainer.appendChild(particula);
+    }
+    
+    // Agregar CSS para la animación
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.4; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.8; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Calculadora de COVID-19
+function inicializarCalculadoraCOVID() {
+    // Función para calcular tiempo de contagio mundial
+    function calcularTiempoContagioMundial(r0, poblacionMundial = 8e9) {
+        // Fórmula simplificada basada en crecimiento exponencial
+        const tiempoDuplicacion = 3; // días (estimado para COVID-19)
+        const log2 = Math.log(2);
+        const tiempoTotal = (Math.log(poblacionMundial) / log2) * tiempoDuplicacion;
+        return tiempoTotal;
+    }
+    
+    // Mostrar información sobre R₀
+    const r0Values = [
+        { variante: 'COVID-19 Original', r0: 2.5, tiempo: calcularTiempoContagioMundial(2.5) },
+        { variante: 'Variante Delta', r0: 6, tiempo: calcularTiempoContagioMundial(6) },
+        { variante: 'Variante Ómicron', r0: 10, tiempo: calcularTiempoContagioMundial(10) }
+    ];
+    
+    // Crear elementos dinámicos para mostrar los resultados
+    const r0Container = document.querySelector('.r0-values');
+    if (r0Container) {
+        r0Values.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'r0-item';
+            div.innerHTML = `
+                <strong>🦠 ${item.variante}:</strong> R₀ ≈ ${item.r0}<br>
+                <small>⏱️ Tiempo estimado sin medidas: ${Math.round(item.tiempo)} días</small>
+            `;
+            r0Container.appendChild(div);
+        });
+    }
+}
+
+// Función de utilidad para mostrar notificaciones
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    // Remover notificaciones existentes
+    const notificacionesExistentes = document.querySelectorAll('.notificacion');
+    notificacionesExistentes.forEach(n => n.remove());
+    
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion notificacion-${tipo}`;
+    notificacion.textContent = mensaje;
+    notificacion.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${tipo === 'error' ? '#ef4444' : tipo === 'success' ? '#10b981' : '#3b82f6'};
+        color: white;
+        padding: 1.2rem 1.8rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        font-weight: 600;
+        font-size: 1.1rem;
+        max-width: 300px;
+    `;
+    
+    document.body.appendChild(notificacion);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notificacion.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        notificacion.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notificacion.parentNode) {
+                notificacion.parentNode.removeChild(notificacion);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Función para exportar datos de simulación
+function exportarDatos() {
+    const tiempo = parseFloat(document.getElementById('sim-tiempo').value) * 24 * 60;
+    const intervalo = parseInt(document.getElementById('sim-intervalo').value);
+    const poblacionInicial = parseInt(document.getElementById('sim-poblacion').value) || 1;
+    
+    const datos = [];
+    for (let i = 0; i <= 100; i++) {
+        const tiempoActual = (tiempo / 100) * i;
+        const resultado = calcularCrecimiento(tiempoActual, intervalo, poblacionInicial);
+        datos.push({
+            tiempo_horas: tiempoActual / 60,
+            tiempo_dias: tiempoActual / (24 * 60),
+            poblacion: resultado.poblacionFinal,
+            masa_kg: resultado.masaTotal,
+            divisiones: resultado.divisiones
+        });
+    }
+    
+    const csv = [
+        'Tiempo (horas),Tiempo (días),Población,Masa (kg),Divisiones',
+        ...datos.map(d => `${d.tiempo_horas},${d.tiempo_dias},${d.poblacion},${d.masa_kg},${d.divisiones}`)
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'simulacion_crecimiento_bacteriano.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    mostrarNotificacion('Datos exportados exitosamente', 'success');
+}
+
+// Función para calcular bacterias que superan la masa de la Luna
+function calcularBacteriasLuna() {
+    const bacteriasLuna = MASSA_LUNA / MASSA_BACTERIA;
+    const elementoLuna = document.getElementById('moon-bacteria-count');
+    const elementoLuna2 = document.getElementById('moon-bacteria-count-2');
+    if (elementoLuna) {
+        elementoLuna.textContent = formatScientific(bacteriasLuna);
+    }
+    if (elementoLuna2) {
+        elementoLuna2.textContent = formatScientific(bacteriasLuna);
+    }
+    return bacteriasLuna;
+}
+
+// Función para calcular bacterias que superan la masa de la Tierra
+function calcularBacteriasTierra() {
+    const bacteriasTierra = MASSA_TERRA / MASSA_BACTERIA;
+    const elementoTierra = document.getElementById('earth-bacteria-count');
+    if (elementoTierra) {
+        elementoTierra.textContent = formatScientific(bacteriasTierra);
+    }
+    return bacteriasTierra;
+}
+
+// Función para inicializar el botón de toggle
+function inicializarToggleReferencia() {
+    const toggleButton = document.getElementById('toggle-reference');
+    const referenceData = document.getElementById('reference-data');
+    
+    if (!toggleButton || !referenceData) return;
+    
+    toggleButton.addEventListener('click', function() {
+        const isVisible = referenceData.style.display !== 'none';
+        
+        if (isVisible) {
+            referenceData.style.display = 'none';
+            toggleButton.textContent = 'Mostrar Datos';
+        } else {
+            referenceData.style.display = 'block';
+            toggleButton.textContent = 'Ocultar Datos';
+        }
+    });
+}
+
+// Inicialización cuando se carga la página
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🦠 Inicializando proyecto: Nos Atacan Virus y Bacterias');
+    
+    // Inicializar todos los componentes
+    inicializarSimulador();
+    inicializarSimuladorInteractivo();
+    inicializarAnimaciones();
+    inicializarNavegacion();
+    inicializarEfectosVisuales();
+    inicializarCalculadoraCOVID();
+    calcularBacteriasLuna(); // Calcular bacterias para masa lunar
+    calcularBacteriasTierra(); // Calcular bacterias para masa terrestre
+    inicializarToggleReferencia(); // Inicializar botón de toggle
+    
+    // Agregar botón de exportación
+    const simulateBtn = document.getElementById('simular');
+    if (simulateBtn) {
+        const exportBtn = document.createElement('button');
+        exportBtn.textContent = '📊 Exportar Datos';
+        exportBtn.className = 'export-btn';
+        exportBtn.style.cssText = `
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            font-size: 1.1rem;
+        `;
+        exportBtn.addEventListener('click', exportarDatos);
+        exportBtn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+            this.style.boxShadow = 'var(--shadow-lg)';
+        });
+        exportBtn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'var(--shadow-md)';
+        });
+        simulateBtn.parentNode.appendChild(exportBtn);
+    }
+    
+    // Mostrar notificación de bienvenida
+    setTimeout(() => {
+        mostrarNotificacion('¡Bienvenido al proyecto de virus y bacterias! 🦠', 'success');
+    }, 1000);
+    
+    console.log('✅ Todos los componentes inicializados correctamente');
+});
+
+// Manejo de errores global
+window.addEventListener('error', function(e) {
+    console.error('Error en la aplicación:', e.error);
+    mostrarNotificacion('Ha ocurrido un error en la aplicación', 'error');
+});
